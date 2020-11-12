@@ -1,5 +1,5 @@
 {
-    "name": "Wantlet",
+    "name": "westcomputerconsultancy/doctrine2-spatial",
     "description": "Some spatial data related classes developed for Doctrine 2",
     "keywords": ["doctrine", "mysql", "spatial"],
     "type": "doctrine-orm",
