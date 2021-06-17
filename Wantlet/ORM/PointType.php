@@ -1,62 +1,47 @@
 <?php
-
 namespace Wantlet\ORM;
-
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\ParameterType;
-use Doctrine\Deprecations\Deprecation;
 
 /**
  * Mapping type for spatial POINT objects
  */
-class PointType extends Type
-{
+class PointType extends Type {
     const POINT = 'point';
-    const SRID = 4326;
 
-
-    public function getName()
-    {
+    /**
+     * Gets the name of this type.
+     *
+     * @return string
+     */
+    public function getName() {
         return self::POINT;
     }
 
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
-    {
+    /**
+     * Gets the SQL declaration snippet for a field of this type.
+     *
+     * @param array $fieldDeclaration The field declaration.
+     * @param AbstractPlatform $platform The currently used database platform.
+     */
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform) {
         return 'POINT';
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
-    {
-        list($longitude, $latitude) = sscanf($value, 'POINT(%f %f)');
-
-        return new Point($latitude, $longitude);
-    }
-
-    public function convertToPHPValueSQL($sqlExpr, $platform)
-    {
-        return sprintf('St_AsText(%s)', $sqlExpr);
-    }
-
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
-    {
-        if ($value instanceof Point) {
-            $value = sprintf('POINT(%F %F)', $value->getLongitude(), $value->getLatitude());
+    public function convertToPHPValue($value, AbstractPlatform $platform) {
+        //Null fields come in as empty strings
+        if($value == '') {
+            return null;
         }
 
-        return $value;
+        $data = unpack('x/x/x/x/corder/Ltype/dlat/dlon', $value);
+        return new \Wantlet\ORM\Point($data['lat'], $data['lon']);
     }
 
-    public function canRequireSQLConversion()
-    {
-        return true;
-    }
-
-
-    public function convertToDatabaseValueSQL($sqlExpr, AbstractPlatform $platform)
-    {
-        return sprintf('St_GeomFromText(%s, %s)', $sqlExpr, 4326);
+    public function convertToDatabaseValue($value, AbstractPlatform $platform) {
+        if (!$value) return;
+        
+        return pack('xxxxcLdd', '0', 1, $value->getLatitude(), $value->getLongitude());
     }
 }

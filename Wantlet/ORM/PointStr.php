@@ -14,7 +14,7 @@ class PointStr extends FunctionNode {
     private $arg;
 
     public function getSql(\Doctrine\ORM\Query\SqlWalker $sqlWalker) {
-        return 'St_GeomFromText(' . $this->arg->dispatch($sqlWalker) . ', 4326)';
+        return 'GeomFromText(' . $this->arg->dispatch($sqlWalker) . ')';
     }
 
     public function parse(\Doctrine\ORM\Query\Parser $parser) {
