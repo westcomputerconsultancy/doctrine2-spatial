@@ -15,6 +15,8 @@ use Doctrine\Deprecations\Deprecation;
 class PointType extends Type
 {
     const POINT = 'point';
+    const SRID = 4326;
+
 
     public function getName()
     {
@@ -32,7 +34,6 @@ class PointType extends Type
 
         return new Point($latitude, $longitude);
     }
-
 
     public function convertToPHPValueSQL($sqlExpr, $platform)
     {
@@ -56,6 +57,6 @@ class PointType extends Type
 
     public function convertToDatabaseValueSQL($sqlExpr, AbstractPlatform $platform)
     {
-        return sprintf('St_GeomFromText(%s)', $sqlExpr);
+        return sprintf('St_GeomFromText(%s, %s)', $sqlExpr, 4326);
     }
 }
